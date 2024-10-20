@@ -1,0 +1,11 @@
+# Building a JAR/WAR file
+FROM maven:3.8.2-jdk as STAGE1
+WORKDIR /home/app/opt
+COPY . /home/app/opt/
+RUN mvn -f /home/app/opt/pom.xml clean package
+
+# Build an image
+FROM openjdk:8-alpine
+EXPOSE 8080
+COPY --from=STAGE1 /home/app/opt/target/maven-web-app.jar maven-app.jar
+ENTRYPOINT ["sh", "-c", "java -jar /maven-app.jar"]
